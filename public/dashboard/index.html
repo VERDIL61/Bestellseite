@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mitarbeiter-Dashboard – Stadt Kebap & Pizzeria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="emoji">🥙</span>
+      <div>
+        <strong>Stadt Kebap</strong>
+        <small>&amp; Pizzeria</small>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-view="neu">
+        <span>📋 Bestellungen</span>
+        <span class="badge" id="badgeNeu">0</span>
+      </button>
+      <button class="nav-item" data-view="in_zubereitung">
+        <span>👨‍🍳 In Zubereitung</span>
+        <span class="badge muted" id="badgeZubereitung">0</span>
+      </button>
+      <button class="nav-item" data-view="fertig">
+        <span>✅ Fertig</span>
+        <span class="badge muted" id="badgeFertig">0</span>
+      </button>
+      <button class="nav-item" data-view="alle">
+        <span>🧾 Alle Bestellungen</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <label class="autoprint-toggle">
+        <span>Automatisch drucken</span>
+        <input type="checkbox" id="autoPrintToggle" />
+      </label>
+      <div class="connection-status" id="connectionStatus">● verbinde …</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <header class="main-header">
+      <h1 id="viewTitle">Neue Bestellungen</h1>
+      <span class="today" id="todayLabel"></span>
+    </header>
+
+    <div class="orders-grid" id="ordersGrid">
+      <p class="empty">Bestellungen werden geladen …</p>
+    </div>
+  </main>
+
+</div>
+
+<!-- Druckvorlage (nur beim Drucken sichtbar) -->
+<div id="printArea" class="print-area"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Stadt Kebap & Pizzeria – Bestellen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-emoji">🥙</span>
+      <div class="brand-text">
+        <h1>Stadt Kebap &amp; Pizzeria</h1>
+        <p>Scan &amp; Bestell</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- KATEGORIEN -->
+  <nav class="category-tabs" id="categoryTabs"></nav>
+
+  <!-- PRODUKT GRID -->
+  <main class="menu" id="menu">
+    <p class="loading">Speisekarte wird geladen …</p>
+  </main>
+
+  <!-- STICKY WARENKORB LEISTE -->
+  <button class="cart-bar hidden" id="cartBar">
+    <span class="cart-bar-count" id="cartBarCount">0</span>
+    <span class="cart-bar-label">Warenkorb ansehen</span>
+    <span class="cart-bar-total" id="cartBarTotal">0,00 €</span>
+  </button>
+
+  <!-- PRODUKT-KONFIGURATION (Bottom Sheet) -->
+  <div class="sheet-overlay hidden" id="productOverlay">
+    <section class="sheet" id="productSheet">
+      <button class="sheet-close" id="productClose" aria-label="Schließen">✕</button>
+      <div class="sheet-body" id="productBody"></div>
+      <footer class="sheet-footer">
+        <div class="qty-stepper">
+          <button id="qtyMinus" aria-label="Weniger">–</button>
+          <span id="qtyValue">1</span>
+          <button id="qtyPlus" aria-label="Mehr">+</button>
+        </div>
+        <button class="btn-primary" id="addToCartBtn">
+          In den Warenkorb <span id="addToCartPrice"></span>
+        </button>
+      </footer>
+    </section>
+  </div>
+
+  <!-- WARENKORB (Bottom Sheet) -->
+  <div class="sheet-overlay hidden" id="cartOverlay">
+    <section class="sheet" id="cartSheet">
+      <button class="sheet-close" id="cartClose" aria-label="Schließen">✕</button>
+      <h2 class="sheet-title">Warenkorb</h2>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-summary">
+        <div class="cart-summary-row">
+          <span>Zwischensumme</span>
+          <span id="cartSubtotal">0,00 €</span>
+        </div>
+      </div>
+      <footer class="sheet-footer">
+        <button class="btn-primary" id="toCheckoutBtn">Weiter zur Bezahlung</button>
+      </footer>
+    </section>
+  </div>
+
+  <!-- CHECKOUT / ZAHLUNGSMETHODE -->
+  <div class="sheet-overlay hidden" id="checkoutOverlay">
+    <section class="sheet" id="checkoutSheet">
+      <button class="sheet-close" id="checkoutClose" aria-label="Schließen">✕</button>
+      <h2 class="sheet-title">Zahlungsmethode wählen</h2>
+
+      <!--Bezahl möglichkeiten-->
+      <div class="pay-options">
+        <button class="pay-option" data-method="kassa">
+          <span class="pay-icon">💶</span>
+          <span class="pay-label">
+            <strong>An der Kassa zahlen</strong>
+            <small>Bar oder Karte bei Abholung</small>
+          </span>
+        </button>
+        <button class="pay-option" data-method="apple_pay">
+          <span class="pay-icon"></span>
+          <span class="pay-label">
+            <strong>Apple Pay</strong>
+            <small>Schnell &amp; kontaktlos</small>
+          </span>
+        </button>
+        <button class="pay-option" data-method="google_pay">
+          <span class="pay-icon">G</span>
+          <span class="pay-label">
+            <strong>Google Pay</strong>
+            <small>Schnell &amp; kontaktlos</small>
+          </span>
+        </button>
+      </div>
+
+      <div class="cart-summary">
+        <div class="cart-summary-row total">
+          <span>Gesamtsumme</span>
+          <span id="checkoutTotal">0,00 €</span>
+        </div>
+      </div>
+
+      <footer class="sheet-footer">
+        <button class="btn-primary" id="placeOrderBtn" disabled>Bestellung aufgeben</button>
+      </footer>
+    </section>
+  </div>
+
+  <!-- BEZAHL-SIMULATION (Apple/Google Pay) -->
+  <div class="sheet-overlay hidden" id="processingOverlay">
+    <section class="processing-card">
+      <div class="spinner"></div>
+      <p id="processingText">Zahlung wird bestätigt …</p>
+    </section>
+  </div>
+
+  <!-- BESTAETIGUNG -->
+  <div class="sheet-overlay hidden" id="confirmOverlay">
+    <section class="confirm-card">
+      <div class="confirm-check">✓</div>
+      <h2>Danke für deine Bestellung!</h2>
+      <p class="confirm-sub">Deine Bestellnummer</p>
+      <div class="order-stamp"><span id="confirmNumber">#0</span></div>
+      <p class="confirm-wait">Geschätzte Wartezeit: <strong id="confirmWait">12–15 Min.</strong></p>
+      <button class="btn-primary" id="newOrderBtn">Neue Bestellung</button>
+    </section>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
