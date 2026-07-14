@@ -37,7 +37,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/orders?status=neu - Bestellungen fuer das Dashboard laden
+// GET /api/orders?status=neu - Bestellungen für das Dashboard laden
 router.get('/', async (req, res) => {
   try {
     const filter = {};
@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// PATCH /api/orders/:id/status - Status aendern (neu -> in_zubereitung -> fertig -> abgeholt)
+// PATCH /api/orders/:id/status - Status ändern (neu -> in_zubereitung -> fertig -> abgeholt)
 router.patch('/:id/status', async (req, res) => {
   try {
     const { status } = req.body;

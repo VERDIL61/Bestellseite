@@ -30,6 +30,31 @@ async function loadOrders() {
   }
 }
 
+// Erzeugt einen kurzen Benachrichtigungston ohne externe Audiodatei
+function playNotificationSound(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = ctx.createOscillator(); // erzeugt den Ton
+    const gainNode = ctx.createGain(); // Steuert die Lautstärke
+
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    oscillator.type = 'sine';
+    oscillator.frequency.value = 880; // Tonhöhe in Hz
+
+    // lautstärke: startet bei 0.3, klingt in 0.5s auf ~0 aus
+    gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + 0.5);
+  } catch (error) {
+    console.warn('Ton konnte nicht abgespielt werden:', error);
+  }
+}
+
+
 // ---------- SOCKET.IO (Live-Updates) ----------
 function connectSocket() {
   const socket = io();
@@ -49,6 +74,7 @@ function connectSocket() {
   socket.on('new-order', (order) => {
     orders.unshift(order);
     renderAll();
+    playNotificationSound();
     if (document.getElementById('autoPrintToggle').checked) {
       printOrder(order._id);
     }
@@ -93,7 +119,7 @@ function renderOrders() {
   let list = orders;
   if (currentView !== 'alle') list = orders.filter((o) => o.status === currentView);
 
-  // Abgeholte Bestellungen nicht in "Alle" Endlosliste haengen lassen zu Ende
+  // Abgeholte Bestellungen nicht in "Alle" Endlosliste hängen lassen zu Ende
   list = [...list].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   if (list.length === 0) {
@@ -183,5 +209,8 @@ function printOrder(orderId) {
   `;
   window.print();
 }
+
+//
+document.getElementById('testSoundBtn').addEventListener('click', playNotificationSound);
 
 init();

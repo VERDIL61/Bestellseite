@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/products/:id - einzelnes Produkt (fuer Konfigurationsseite)
+// GET /api/products/:id - einzelnes Produkt (für Konfigurationsseite)
 router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);

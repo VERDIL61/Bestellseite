@@ -20,6 +20,7 @@ app.use(express.json());
 // Statische Dateien: Kunden-Seite unter /, Dashboard unter /dashboard
 app.use('/', express.static('public/customer'));
 app.use('/dashboard', express.static('public/dashboard'));
+app.use('/tv', express.static('public/tv'));
 
 // API
 app.use('/api/products', productRoutes);
