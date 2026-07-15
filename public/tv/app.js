@@ -16,7 +16,7 @@ function connectSocket() {
     socket.on("connect", () => socket.emit('join', 'tv'));
 
     socket.on('order-updated', (updated) => {
-        const idx = orders.findIndex(o => o.id === updated._id);
+        const idx = orders.findIndex(o => o._id === updated._id);
         if (idx !== -1) {
             orders[idx] = updated; // bestehende Bestellung aktualisieren
         } else {
