@@ -39,6 +39,9 @@
       <button class="nav-item" data-view="alle">
         <span>🧾 Alle Bestellungen</span>
       </button>
+      <button class="nav-item" data-view="produkte">
+        <span>🛒 Produkte</span>
+      </button>
     </nav>
 
     <div class="sidebar-footer">
@@ -61,9 +64,12 @@
     <div class="orders-grid" id="ordersGrid">
       <p class="empty">Bestellungen werden geladen …</p>
     </div>
-  </main>
 
-</div>
+    <div class="products-view hidden" id="productsView">
+      <button class="btn-add-product" id="addProductBtn">+ Neues Produkt</button>
+      <div class="products-list" id="productsList"></div>
+    </div>
+  </main>
 
 <!-- Druckvorlage (nur beim Drucken sichtbar) -->
 <div id="printArea" class="print-area"></div>

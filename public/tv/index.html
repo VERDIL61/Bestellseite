@@ -7,12 +7,20 @@
 </head>
 <body>
 
-<header class="tv-header">🥙 Stadt Kebap &amp; Pizzeria</header>
+<header class="tv-header">
+    <span>🥙 Stadt Kebap &amp; Pizzeria</span>
+    <span class="tv-status" id="connectionStatus">* Verbinde ...</span>
+</header>
+
 
 <main class="tv-columns">
     <section class="tv-column ready">
         <h2>Fertig zur Abholung</h2>
         <div class="tv-numbers" id="readyNumbers"></div>
+    </section>
+    <section class="tv-column preparing">
+        <h2>In Zubereitung</h2>
+        <div class="tv-numbers" id="preparingNumbers"></div>
     </section>
 </main>
 

@@ -3,6 +3,7 @@
     --herb: #4c7a3b;
     --amber: #e8a33d;
     --text-light: #f5efe4;
+    --text-muted: #8f8577;
     --border-subtle: #3a332b;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,10 +16,28 @@ html, body {
 }
 
 .tv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 24px 40px;
     font-size: 28px;
     font-weight: 700;
     border-bottom: 2px solid var(--border-subtle);
+}
+
+.tv-status {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+.tv-status.online{
+    color: var(--herb);
+}
+
+.tv-empty{
+    color: var(--text-muted);
+    font-size: 20px;
+    font-style: italic;
 }
 
 .tv-columns {

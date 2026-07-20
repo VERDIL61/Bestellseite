@@ -4,7 +4,7 @@ let currentView = 'neu'; // "neu" | "in_zubereitung" | "fertig" | "alle"
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' });
 
-const statusLabels = { neu: 'Neue Bestellungen', in_zubereitung: 'In Zubereitung', fertig: 'Fertig', alle: 'Alle Bestellungen' };
+const statusLabels = { neu: 'Neue Bestellungen', in_zubereitung: 'In Zubereitung', fertig: 'Fertig', alle: 'Alle Bestellungen', produkte: 'Produkte verwalten' };
 
 // ---------- INIT ----------
 async function init() {
@@ -92,7 +92,16 @@ function switchView(view) {
   currentView = view;
   document.querySelectorAll('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
   document.getElementById('viewTitle').textContent = statusLabels[view];
-  renderOrders();
+
+  if (view === 'produkte') {
+    document.getElementById('ordersGrid').classList.add('hidden');
+    document.getElementById('productsView').classList.remove('hidden');
+    loadProducts();
+  } else {
+    document.getElementById('productsView').classList.add('hidden');
+    document.getElementById('ordersGrid').classList.remove('hidden');
+    renderOrders();
+  }
 }
 
 // ---------- RENDER ----------
@@ -212,5 +221,70 @@ function printOrder(orderId) {
 
 //
 document.getElementById('testSoundBtn').addEventListener('click', playNotificationSound);
+
+// Produktverwaltung
+let products = [];
+
+async function loadProducts() {
+  try {
+    const res = await fetch('/api/products');
+    products = await res.json();
+    renderProducts();
+  } catch (err) {
+    document.getElementById('productsList').innerHTML = '<p class="empty">Produkte konnten nicht geladen werden.</p>';
+  }
+}
+
+function renderProducts() {
+  const el = document.getElementById('productsList');
+
+  if (products.length === 0) {
+    el.innerHTML = '<p class="empty">Noch keine Produkte angelegt.</p>';
+    return;
+  }
+
+  el.innerHTML = products.map(p => `
+  <div class="product-row"></div>
+       <span class="emoji">${p.emoji}</span>
+       <div class="product-row-info">
+       <div class="name">${p.name}</div>
+       <div class="meta">${p.category}</div>
+</div>
+<span class="products-row-price">${fmt(p.basePrice)}</span>
+<div class="product-row-actions">
+                <button class="btn-edit" data-edit="${p._id}">Bearbeiten</button>
+                <button class="btn-delete" data-delete="${p._id}">Löschen</button>
+</div>
+  </div>
+    \`).join('');
+    
+        el.querySelectorAll('[data-delete]').forEach(btn => {
+        btn.addEventListener('click', () => deleteProduct(btn.dataset.delete));
+    });
+    el.querySelectorAll('[data-edit]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            alert('Bearbeiten kommt im nächsten Schritt!'); // ← TODO Schritt 3
+        });
+    });
+}
+
+async function deleteProduct(id) {
+    const product = products.find(p => p._id === id);
+    if (!confirm(\`"${product.name}" wirklich löschen?\`)) return; // einfache Sicherheitsabfrage
+
+    try {
+        await fetch(\`/api/products/${id}\`, { method: 'DELETE' });
+        loadProducts(); // Liste danach neu laden
+    } catch (err) {
+        alert('Produkt konnte nicht gelöscht werden.');
+    }
+}
+
+document.getElementById('addProductBtn').addEventListener('click', () => {
+    alert('Neues Produkt anlegen kommt im nächsten Schritt!'); // ← TODO Schritt 3
+});
+       
+`)
+}
 
 init();
