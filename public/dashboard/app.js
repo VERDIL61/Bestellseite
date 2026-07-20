@@ -244,47 +244,108 @@ function renderProducts() {
   }
 
   el.innerHTML = products.map(p => `
-  <div class="product-row"></div>
+  <div class="product-row">
        <span class="emoji">${p.emoji}</span>
        <div class="product-row-info">
        <div class="name">${p.name}</div>
        <div class="meta">${p.category}</div>
 </div>
-<span class="products-row-price">${fmt(p.basePrice)}</span>
+<span class="product-row-price">${fmt(p.basePrice)}</span>
 <div class="product-row-actions">
                 <button class="btn-edit" data-edit="${p._id}">Bearbeiten</button>
                 <button class="btn-delete" data-delete="${p._id}">Löschen</button>
 </div>
   </div>
-    \`).join('');
+    `).join('');
     
         el.querySelectorAll('[data-delete]').forEach(btn => {
         btn.addEventListener('click', () => deleteProduct(btn.dataset.delete));
     });
     el.querySelectorAll('[data-edit]').forEach(btn => {
         btn.addEventListener('click', () => {
-            alert('Bearbeiten kommt im nächsten Schritt!'); // ← TODO Schritt 3
+          const product = products.find(p => p._id === btn.dataset.edit);
+          openProductForm(product);
         });
     });
 }
 
 async function deleteProduct(id) {
     const product = products.find(p => p._id === id);
-    if (!confirm(\`"${product.name}" wirklich löschen?\`)) return; // einfache Sicherheitsabfrage
+    if (!confirm(`"${product.name}" wirklich löschen`)) return; // einfache Sicherheitsabfrage
 
     try {
-        await fetch(\`/api/products/${id}\`, { method: 'DELETE' });
+        await fetch(`/api/products/${id}`, {
+          method: 'DELETE'
+        });
         loadProducts(); // Liste danach neu laden
     } catch (err) {
         alert('Produkt konnte nicht gelöscht werden.');
     }
 }
 
-document.getElementById('addProductBtn').addEventListener('click', () => {
-    alert('Neues Produkt anlegen kommt im nächsten Schritt!'); // ← TODO Schritt 3
-});
-       
-`)
+let editingProductId = null; // null = neues Produkt, sonst die ID des bearbeiteten Produkts
+
+function updateCategoryDatalist() {
+  const categories = [...new Set(products.map(p => p.category))];
+  document.getElementById('categoryOptions').innerHTML = categories.map(c => `<option value="${c}"></option>`).join('');
 }
 
+function openProductForm(product) {
+  editingProductId = product ? product._id : null;
+  document.getElementById('productFormTitle').textContent = product ? 'Produkt bearbeiten' : 'Neues Produkt';
+
+  document.getElementById('pfName').value = product ? product.name : '';
+  document.getElementById('pfCategory').value = product ? product.category : '';
+  document.getElementById('pfDescription').value = product ? product.description : '';
+  document.getElementById('pfBasePrice').value = product ? product.basePrice : '';
+  document.getElementById('pfEmoji').value = product ? product.emoji : '';
+  document.getElementById('pfPopular').checked = product ? product.popular : false;
+
+  updateCategoryDatalist();
+  document.getElementById('productFormOverlay').classList.remove('hidden');
+}
+
+function closeProductForm() {
+  document.getElementById('productFormOverlay').classList.add('hidden');
+}
+
+document.getElementById('productFormClose').addEventListener('click', closeProductForm);
+document.getElementById('productFormCancel').addEventListener('click', closeProductForm);
+
+document.getElementById('productForm').addEventListener('submit', async (e) => {
+  e.preventDefault(); // verhindert, dass der Browser die Seite neu laedt (Standard-Verhalten von <form>)
+
+  const payload = {
+    name: document.getElementById('pfName').value,
+    category: document.getElementById('pfCategory').value,
+    description: document.getElementById('pfDescription').value,
+    basePrice: Number(document.getElementById('pfBasePrice').value),
+    emoji: document.getElementById('pfEmoji').value || '🍽️',
+    popular: document.getElementById('pfPopular').checked
+  };
+
+  try {
+    if (editingProductId) {
+      await fetch(`/api/products/${editingProductId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } else {
+      await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    }
+    closeProductForm();
+    loadProducts();
+  } catch (err) {
+    alert('Produkt konnte nicht gespeichert werden.');
+  }
+});
+
+document.getElementById('addProductBtn').addEventListener('click', () => {
+    openProductForm(null);
+});
 init();
