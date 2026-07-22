@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
 const { getNextOrderNumber } = require('../models/Counter');
+const requireAuth = require('../middleware/requireAuth');
 
 // POST /api/orders - neue Bestellung vom Kunden anlegen
 router.post('/', async (req, res) => {
@@ -12,7 +13,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Der Warenkorb ist leer.' });
     }
     if (!['kassa', 'apple_pay', 'google_pay'].includes(paymentMethod)) {
-      return res.status(400).json({ error: 'Ungueltige Zahlungsmethode.' });
+      return res.status(400).json({ error: 'Ungültige Zahlungsmethode.' });
     }
 
     const { orderNumber, dateKey } = await getNextOrderNumber();
@@ -53,11 +54,11 @@ router.get('/', async (req, res) => {
 });
 
 // PATCH /api/orders/:id/status - Status ändern (neu -> in_zubereitung -> fertig -> abgeholt)
-router.patch('/:id/status', async (req, res) => {
+router.patch('/:id/status', requireAuth, async (req, res) => {
   try {
     const { status } = req.body;
     if (!['neu', 'in_zubereitung', 'fertig', 'abgeholt'].includes(status)) {
-      return res.status(400).json({ error: 'Ungueltiger Status.' });
+      return res.status(400).json({ error: 'Ungültiger Status.' });
     }
 
     const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
@@ -69,7 +70,7 @@ router.patch('/:id/status', async (req, res) => {
 
     res.json(order);
   } catch (err) {
-    res.status(500).json({ error: 'Status konnte nicht geaendert werden.' });
+    res.status(500).json({ error: 'Status konnte nicht geändert werden.' });
   }
 });
 

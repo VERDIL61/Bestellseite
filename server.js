@@ -12,10 +12,22 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+const session = require('express-session');
+const authRoutes = require('./routes/auth');
+
+
+
 app.set('io', io); // damit routes/orders.js Events senden kann
 
 app.use(cors());
 app.use(express.json());
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 1000 * 60 * 60 * 8 } // Session bleibt 8 Stunden gültig
+}));
 
 // Statische Dateien: Kunden-Seite unter /, Dashboard unter /dashboard
 app.use('/', express.static('public/customer'));
@@ -25,6 +37,7 @@ app.use('/tv', express.static('public/tv'));
 // API
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/auth', authRoutes);
 
 // Sockets: Clients treten "Raeumen" bei, je nachdem ob sie Dashboard oder TV-Screen sind
 io.on('connection', (socket) => {

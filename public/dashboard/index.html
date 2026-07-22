@@ -95,7 +95,7 @@
 
       <label>
         Beschreibung
-        <textarea id="pfDescription" row="2"></textarea>
+        <textarea id="pfDescription" rows="2"></textarea>
       </label>
 
       <div class="form-row">
@@ -118,6 +118,15 @@
       <div class="modal-actions">
         <button type="button" class="btn-cancel" id="productFromCancel">Abbrechen</button>
         <button type="submit" class="btn-save">Speichern</button>
+      </div>
+
+      <!-- Options-Gruppen-Editor ins Formular einfügen -->
+      <div class="option-group-editor">
+        <div class="option-groups-header">
+          <h3>Options-Gruppen</h3>
+          <button type="button" class="btn-add-group" id="addGroupBtn">+ Gruppe</button>
+        </div>
+        <div id="optionGroupsList"></div>
       </div>
 
     </form>

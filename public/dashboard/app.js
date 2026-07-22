@@ -285,6 +285,94 @@ async function deleteProduct(id) {
 
 let editingProductId = null; // null = neues Produkt, sonst die ID des bearbeiteten Produkts
 
+let currentOptionGroups = []; // die Options-Gruppen des gerade geöffneten Formulars
+
+function renderOptionGroupsEditor() {
+  const el = document.getElementById('optionGroupsList');
+
+  el.innerHTML = currentOptionGroups.map((group, gIdx) => `
+  <div class="option-group-card">
+    <div class="option-group-card-header">
+    <input type="text" placeholder="Name (z.B. Fleisch)" value="${group.name}" data-group-name="${gIdx}" />
+    <select data-group-type="${gIdx}">
+    <option value="single" ${group.type === 'single' ? 'selected' : ''}>Einzelauswahl</option>
+                    <option value="multi" ${group.type === 'multi' ? 'selected' : ''}>Mehrfachauswahl</option>
+                </select>
+                <button type="button" data-remove-group="${gIdx}">✕</button>
+            </div>
+            <label class="option-group-required">
+                <input type="checkbox" ${group.required ? 'checked' : ''} data-group-required="${gIdx}" />
+                Pflichtfeld
+            </label>
+            ${group.choices.map((choice, cIdx) => `
+                <div class="choice-row">
+                    <input type="text" placeholder="Bezeichnung" value="${choice.label}" data-choice-label="${gIdx}-${cIdx}" />
+                    <input type="number" step="0.10" placeholder="Aufpreis €" value="${choice.priceModifier}" data-choice-price="${gIdx}-${cIdx}" />
+                    <button type="button" data-remove-choice="${gIdx}-${cIdx}">✕</button>
+                </div>
+            `).join('')}
+            <button type="button" class="btn-add-choice" data-add-choice="${gIdx}">+ Auswahl hinzufügen</button>
+        </div>
+    `).join('');
+
+// Texteingaben: Wert NUR im Array aktualisieren, KEIN renderOptionGroupsEditor() aufrufen!
+    // Sonst verliert das Feld beim Tippen sofort den Fokus.
+    el.querySelectorAll('[data-group-name]').forEach(input => {
+        input.addEventListener('input', () => {
+            currentOptionGroups[input.dataset.groupName].name = input.value;
+        });
+    });
+    el.querySelectorAll('[data-group-type]').forEach(select => {
+        select.addEventListener('change', () => {
+            currentOptionGroups[select.dataset.groupType].type = select.value;
+        });
+    });
+    el.querySelectorAll('[data-group-required]').forEach(cb => {
+        cb.addEventListener('change', () => {
+            currentOptionGroups[cb.dataset.groupRequired].required = cb.checked;
+        });
+    });
+    el.querySelectorAll('[data-choice-label]').forEach(input => {
+        input.addEventListener('input', () => {
+            const [gIdx, cIdx] = input.dataset.choiceLabel.split('-');
+            currentOptionGroups[gIdx].choices[cIdx].label = input.value;
+        });
+    });
+    el.querySelectorAll('[data-choice-price]').forEach(input => {
+        input.addEventListener('input', () => {
+            const [gIdx, cIdx] = input.dataset.choicePrice.split('-');
+            currentOptionGroups[gIdx].choices[cIdx].priceModifier = Number(input.value) || 0;
+        });
+    });
+
+    // Strukturelle Aenderungen (Gruppe/Auswahl hinzufuegen oder entfernen): HIER wird neu gerendert
+    el.querySelectorAll('[data-remove-group]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentOptionGroups.splice(btn.dataset.removeGroup, 1);
+            renderOptionGroupsEditor();
+        });
+    });
+    el.querySelectorAll('[data-add-choice]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentOptionGroups[btn.dataset.addChoice].choices.push({ label: '', priceModifier: 0 });
+            renderOptionGroupsEditor();
+        });
+    });
+    el.querySelectorAll('[data-remove-choice]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const [gIdx, cIdx] = btn.dataset.removeChoice.split('-');
+            currentOptionGroups[gIdx].choices.splice(cIdx, 1);
+            renderOptionGroupsEditor();
+        });
+    });
+}
+
+document.getElementById('addGroupBtn').addEventListener('click', () => {
+    currentOptionGroups.push({ name: '', type: 'single', required: false, choices: [] });
+    renderOptionGroupsEditor();
+});
+
+
 function updateCategoryDatalist() {
   const categories = [...new Set(products.map(p => p.category))];
   document.getElementById('categoryOptions').innerHTML = categories.map(c => `<option value="${c}"></option>`).join('');
@@ -300,6 +388,12 @@ function openProductForm(product) {
   document.getElementById('pfBasePrice').value = product ? product.basePrice : '';
   document.getElementById('pfEmoji').value = product ? product.emoji : '';
   document.getElementById('pfPopular').checked = product ? product.popular : false;
+
+  // Änderungen im Formular dürfen nicht sofort das Original in "products" verändern,
+  // bevor "Speichern" geklickt wurde
+  currentOptionGroups = product ? JSON.parse(JSON.stringify(product.optionGroups)) : [];
+  renderOptionGroupsEditor();
+
 
   updateCategoryDatalist();
   document.getElementById('productFormOverlay').classList.remove('hidden');
@@ -321,7 +415,8 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     description: document.getElementById('pfDescription').value,
     basePrice: Number(document.getElementById('pfBasePrice').value),
     emoji: document.getElementById('pfEmoji').value || '🍽️',
-    popular: document.getElementById('pfPopular').checked
+    popular: document.getElementById('pfPopular').checked,
+    optionGroups: currentOptionGroups
   };
 
   try {

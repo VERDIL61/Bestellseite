@@ -282,3 +282,40 @@ html, body { margin: 0; padding: 0; font-family: var(--font-body); background: v
 }
 .btn-cancel { background: var(--cream); color: var(--text-dark); }
 .btn-save { background: var(--herb); color: white; }
+
+.option-groups-editor { border-top: 1px solid var(--border); padding-top: 14px; }
+.option-groups-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.option-groups-header h3 { font-size: 13px; margin: 0; color: var(--text-muted); text-transform: uppercase; }
+.btn-add-group {
+  background: var(--cream); border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+}
+
+.option-group-card {
+  background: var(--cream); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px; margin-bottom: 10px;
+}
+.option-group-card-header { display: flex; gap: 8px; margin-bottom: 8px; }
+.option-group-card-header input[type="text"] { flex: 1; }
+.option-group-card-header select { border: 1px solid var(--border); border-radius: 8px; padding: 8px; font-size: 13px; }
+.option-group-card-header button {
+  background: #fbe4e0; color: var(--paprika); border: none; border-radius: 8px;
+  padding: 0 10px; font-size: 13px; cursor: pointer;
+}
+
+.option-group-required { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-bottom: 8px; }
+.option-group-required input { width: auto; }
+
+.choice-row { display: flex; gap: 8px; margin-bottom: 6px; align-items: center; }
+.choice-row input[type="text"] { flex: 2; }
+.choice-row input[type="number"] { flex: 1; }
+.choice-row button {
+  background: #fbe4e0; color: var(--paprika); border: none; border-radius: 6px;
+  padding: 6px 10px; font-size: 12px; cursor: pointer;
+}
+.btn-add-choice {
+  background: none; border: 1px dashed var(--border); border-radius: 6px;
+  padding: 6px 10px; font-size: 12px; color: var(--text-muted); cursor: pointer; width: 100%;
+}
+
+
