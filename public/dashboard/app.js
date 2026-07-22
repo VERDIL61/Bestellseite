@@ -89,9 +89,11 @@ function connectSocket() {
 
 // ---------- VIEW SWITCH ----------
 function switchView(view) {
+  closeProductForm();   // schließt sich beim jedem Tab-Wechsel
   currentView = view;
   document.querySelectorAll('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
   document.getElementById('viewTitle').textContent = statusLabels[view];
+  document.getElementById('addProductIconBtn').classList.toggle('hidden', view !== 'produkte');
 
   if (view === 'produkte') {
     document.getElementById('ordersGrid').classList.add('hidden');
@@ -407,7 +409,7 @@ document.getElementById('productFormClose').addEventListener('click', closeProdu
 document.getElementById('productFormCancel').addEventListener('click', closeProductForm);
 
 document.getElementById('productForm').addEventListener('submit', async (e) => {
-  e.preventDefault(); // verhindert, dass der Browser die Seite neu laedt (Standard-Verhalten von <form>)
+  e.preventDefault(); // verhindert, dass der Browser die Seite neu lädt (Standard-Verhalten von <form>)
 
   const payload = {
     name: document.getElementById('pfName').value,
@@ -440,7 +442,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
   }
 });
 
-document.getElementById('addProductBtn').addEventListener('click', () => {
+document.getElementById('addProductIconBtn').addEventListener('click', () => {
     openProductForm(null);
 });
 init();

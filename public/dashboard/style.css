@@ -170,16 +170,23 @@ html, body { margin: 0; padding: 0; font-family: var(--font-body); background: v
 
 .products-view { margin-top: 4px; }
 
-.btn-add-product {
+.header-title-row { display: flex; align-items: center; gap: 12px; }
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 100px;
+  border: none;
   background: var(--herb);
   color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 18px;
-  font-weight: 600;
-  font-size: 14px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
   cursor: pointer;
-  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .products-list { display: flex; flex-direction: column; gap: 10px; }
@@ -258,6 +265,7 @@ html, body { margin: 0; padding: 0; font-family: var(--font-body); background: v
 #productForm input[type="text"],
 #productForm input[type="number"],
 #productForm textarea {
+  width: 100%;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 9px 10px;
@@ -266,7 +274,7 @@ html, body { margin: 0; padding: 0; font-family: var(--font-body); background: v
   color: var(--text-dark);
 }
 .form-row { display: flex; gap: 12px; }
-.form-row label { flex: 1; }
+.form-row label { flex: 1; min-width: 0; }
 
 .checkbox-label { flex-direction: row !important; align-items: center; gap: 8px !important; }
 .checkbox-label input { width: auto; }
