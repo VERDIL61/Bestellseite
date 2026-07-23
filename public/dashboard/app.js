@@ -276,9 +276,13 @@ async function deleteProduct(id) {
     if (!confirm(`"${product.name}" wirklich löschen`)) return; // einfache Sicherheitsabfrage
 
     try {
-        await fetch(`/api/products/${id}`, {
+        const res = await fetch(`/api/products/${id}`, {
           method: 'DELETE'
         });
+        if (!res.ok){
+            alert('Produkt konnte nicht gelöscht werden (nicht angemeldet?).');
+            return;
+        }
         loadProducts(); // Liste danach neu laden
     } catch (err) {
         alert('Produkt konnte nicht gelöscht werden.');
@@ -421,28 +425,129 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     optionGroups: currentOptionGroups
   };
 
+  // Fehler sichtbar machen
   try {
-    if (editingProductId) {
-      await fetch(`/api/products/${editingProductId}`, {
-        method: 'PUT',
+    const url = editingProductId ? `/api/products/${editingProductId}`: `/api/products`;
+    const method = editingProductId ? `PUT` : 'POST';
+
+    const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      });
-    } else {
-      await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+    });
+
+    if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Produkt konnte nicht gespeichert werden.');
+        return;
     }
+
     closeProductForm();
     loadProducts();
   } catch (err) {
     alert('Produkt konnte nicht gespeichert werden.');
   }
 });
+//------------------------------------------------------
 
 document.getElementById('addProductIconBtn').addEventListener('click', () => {
     openProductForm(null);
 });
-init();
+
+// Login
+async function checkAuth() {
+    try {
+        const res = await fetch('/api/auth/status');
+        const data = await res.json();
+        return data.isAdmin;
+    } catch (err) {
+        return false;
+    }
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    errorEl.textContent = '';
+
+    try {
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+
+        if (!res.ok) {
+            errorEl.textContent = 'Falsches Passwort.';
+            return;
+        }
+
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('loginOverlay').classList.add('hidden');
+        init(); // erst Nach erfolgreichem Login das Dashboard starten
+    } catch (err) {
+        errorEl.textContent = 'Verbindung zum Server fehlgeschlagen';
+    }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    location.reload();
+});
+
+// ---------- PASSWORT ÄNDERN ----------
+document.getElementById('changePasswordBtn').addEventListener('click', () => {
+    document.getElementById('passwordForm').reset();
+    document.getElementById('passwordFormError').textContent = '';
+    document.getElementById('passwordFormOverlay').classList.remove('hidden');
+});
+
+document.getElementById('passwordFormClose').addEventListener('click', () => {
+    document.getElementById('passwordFormOverlay').classList.add('hidden');
+});
+document.getElementById('passwordFormCancel').addEventListener('click', () => {
+    document.getElementById('passwordFormOverlay').classList.add('hidden');
+});
+
+document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const currentPassword = document.getElementById('currentPasswordInput').value;
+    const newPassword = document.getElementById('newPasswordInput').value;
+    const confirmPassword = document.getElementById('confirmPasswordInput').value;
+    const errorEl = document.getElementById('passwordFormError');
+    errorEl.textContent = '';
+
+    if (newPassword !== confirmPassword) {
+        errorEl.textContent = 'Die neuen Passwörter stimmen nicht überein.';
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/auth/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword, newPassword })
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+            errorEl.textContent = data.error || 'Passwort konnte nicht geändert werden.';
+            return;
+        }
+
+        document.getElementById('passwordFormOverlay').classList.add('hidden');
+        alert('Passwort erfolgreich geändert.');
+    } catch (err) {
+        errorEl.textContent = 'Verbindung zum Server fehlgeschlagen.';
+    }
+});
+
+// beim Laden prüfen ob die Session noch gültig ist
+checkAuth().then((isAdmin) => {
+    if (isAdmin) {
+        document.getElementById('loginOverlay').classList.add('hidden');
+        init();
+    }
+})

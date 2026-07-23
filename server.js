@@ -15,7 +15,8 @@ const io = new Server(server);
 const session = require('express-session');
 const authRoutes = require('./routes/auth');
 
-
+const Admin = require('./models/Admin');
+const bcrypt =require('bcryptjs');
 
 app.set('io', io); // damit routes/orders.js Events senden kann
 
@@ -51,10 +52,19 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 
-connectDB().then(() => {
+connectDB().then(async () => {
+  // Beim allerersten Start: Admin-Konto aus ADMIN_PASSWORD (.env) anlegen, falls noch keins existiert
+  const existingAdmin = await Admin.findOne();
+  if (!existingAdmin) {
+    const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10)
+    await Admin.create({ passwordHash });
+    console.log('🔑Erstes Admin-Konto aus ADMIN_PASSWORD angelegt.');
+  }
+
   server.listen(PORT, () => {
-    console.log(`🥙 Server laeuft auf http://localhost:${PORT}`);
+    console.log(`🥙 Server läuft auf http://localhost:${PORT}`);
     console.log(`   Kunden-Bestellseite: http://localhost:${PORT}`);
     console.log(`   Mitarbeiter-Dashboard: http://localhost:${PORT}/dashboard`);
-  });
-});
+  })
+})
+

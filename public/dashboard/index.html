@@ -11,6 +11,18 @@
 </head>
 <body>
 
+<div class="login-overlay" id="loginOverlay">
+  <form class="login-card" id="loginForm">
+    <h1>🥙 Mitarbeiter-Login</h1>
+    <label>
+      Passwort
+      <input type="password" id="loginPassword" required />
+    </label>
+    <p class="login-error" id="loginError"></p>
+    <button type="submit" class="login-btn">Anmelden</button>
+  </form>
+</div>
+
 <div class="layout">
 
   <!-- SIDEBAR -->
@@ -51,6 +63,8 @@
         <input type="checkbox" id="autoPrintToggle" />
       </label>
       <div class="connection-status" id="connectionStatus">● verbinde …</div>
+      <button id="logoutBtn" class="logout-btn">Abmelden</button>
+      <button id="changePasswordBtn" class="logout-btn" style="margin-top:6px;">Password ändern</button>
     </div>
   </aside>
 
@@ -117,12 +131,12 @@
       </label>
 
       <div class="modal-actions">
-        <button type="button" class="btn-cancel" id="productFromCancel">Abbrechen</button>
+        <button type="button" class="btn-cancel" id="productFormCancel">Abbrechen</button>
         <button type="submit" class="btn-save">Speichern</button>
       </div>
 
       <!-- Options-Gruppen-Editor ins Formular einfügen -->
-      <div class="option-group-editor">
+      <div class="option-groups-editor">
         <div class="option-groups-header">
           <h3>Options-Gruppen</h3>
           <button type="button" class="btn-add-group" id="addGroupBtn">+ Gruppe</button>
@@ -133,6 +147,36 @@
     </form>
   </section>
 </div>
+  <!-- Passwort ändern (Modal) -->
+  <div class="modal-overlay hidden" id="passwordFormOverlay">
+    <section class="modal">
+      <button class="modal-close" id="passwordFormClose">✕</button>
+      <h2>Passwort ändern</h2>
+
+      <form id="passwordForm">
+        <label>
+          Aktuelles Passwort
+          <input type="password" id="currentPasswordInput" required />
+        </label>
+        <label>
+          Neues Passwort
+          <input type="password" id="newPasswordInput" required minlength="4" />
+        </label>
+
+        <label>
+          Neues Passwort bestätigen
+          <input type="password" id="confirmPasswordInput" required minlength="4" />
+        </label>
+
+        <p class="login-error" id="passwordFormError"></p>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="passwordFormCancel">Abbrechen</button>
+          <button type="submit" class="btn-save">Speichern</button>
+        </div>
+      </form>
+    </section>
+  </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="app.js"></script>
