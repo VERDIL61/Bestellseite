@@ -7,11 +7,16 @@ const requireAuth = require('../middleware/requireAuth');
 // POST /api/orders - neue Bestellung vom Kunden anlegen
 router.post('/', async (req, res) => {
   try {
-    const { items, subtotal, paymentMethod } = req.body;
+    const { items, subtotal, paymentMethod, diningOption } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ error: 'Der Warenkorb ist leer.' });
     }
+    if (!['vor_ort', 'mitnehmen'].includes(diningOption)) {
+      return res.status(400).json({ error: 'Bitte "Vor Ort" oder "Zum Mitnehmen" auswählen.'});
+    }
+
+
     if (!['kassa', 'apple_pay', 'google_pay'].includes(paymentMethod)) {
       return res.status(400).json({ error: 'Ungültige Zahlungsmethode.' });
     }
@@ -23,6 +28,7 @@ router.post('/', async (req, res) => {
       dateKey,
       items,
       subtotal,
+      diningOption,
       paymentMethod,
       status: 'neu'
     });

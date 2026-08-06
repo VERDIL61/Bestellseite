@@ -9,6 +9,7 @@ let currentSelections = {}; // { groupName: [label, ...] }
 let currentQty = 1;
 
 let selectedPaymentMethod = null;
+let selectedDiningOption = null;
 
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 
@@ -195,9 +196,14 @@ function bindStaticEvents() {
   document.getElementById('checkoutClose').addEventListener('click', () => {
     document.getElementById('checkoutOverlay').classList.add('hidden');
   });
+
   document.querySelectorAll('.pay-option').forEach((btn) => {
     btn.addEventListener('click', () => selectPaymentMethod(btn.dataset.method, btn));
   });
+  document.querySelectorAll('.dining-option').forEach((btn) => {
+    btn.addEventListener('click', () => selectDiningOption(btn.dataset.option, btn));
+  });
+
   document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
 
   document.getElementById('newOrderBtn').addEventListener('click', resetForNewOrder);
@@ -307,7 +313,9 @@ function openCheckout() {
   if (cart.length === 0) return;
   document.getElementById('cartOverlay').classList.add('hidden');
   selectedPaymentMethod = null;
+  selectedDiningOption = null;
   document.querySelectorAll('.pay-option').forEach((b) => b.classList.remove('selected'));
+  document.querySelectorAll('.dining-option').forEach((b) => b.classList.remove('selected'));
   document.getElementById('placeOrderBtn').disabled = true;
   document.getElementById('checkoutTotal').textContent = fmt(cartTotal());
   document.getElementById('checkoutOverlay').classList.remove('hidden');
@@ -317,7 +325,19 @@ function selectPaymentMethod(method, btn) {
   selectedPaymentMethod = method;
   document.querySelectorAll('.pay-option').forEach((b) => b.classList.remove('selected'));
   btn.classList.add('selected');
-  document.getElementById('placeOrderBtn').disabled = false;
+  updatePlaceOrderButtonState();
+}
+
+function selectDiningOption(option, btn) {
+  selectedDiningOption = option;
+  document.querySelectorAll('.dining-option').forEach((b) => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  updatePlaceOrderButtonState();
+}
+
+// Bestellen button erst aktivieren, wenn beide Auswählen getroffen wurde
+function updatePlaceOrderButtonState() {
+  document.getElementById('placeOrderBtn').disabled = !(selectedPaymentMethod && selectedDiningOption);
 }
 
 async function placeOrder() {
@@ -344,6 +364,7 @@ async function placeOrder() {
       selectedOptions: i.selectedOptions
     })),
     subtotal: cartTotal(),
+    diningOption: selectedDiningOption,
     paymentMethod: selectedPaymentMethod
   };
 

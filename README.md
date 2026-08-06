@@ -143,3 +143,12 @@
 3. Auf GitHub hochladen (Push)  
    
  “ git push “  
+
+## Lizenz
+
+Dieses Projekt steht unter der PolyForm Noncommercial License 1.0.0.
+Nutzung, Weitergabe und Veränderung sind für nicht-kommerzielle Zwecke
+gestattet. Jede kommerzielle Nutzung bedarf der ausdrücklichen
+schriftlichen Genehmigung des Autors.
+
+Copyright (c) 2026 Ferdinand Verdil

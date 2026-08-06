@@ -79,30 +79,36 @@
   <div class="sheet-overlay hidden" id="checkoutOverlay">
     <section class="sheet" id="checkoutSheet">
       <button class="sheet-close" id="checkoutClose" aria-label="Schließen">✕</button>
-      <h2 class="sheet-title">Zahlungsmethode wählen</h2>
 
-      <!--Bezahl möglichkeiten-->
+      <h2 class="sheet-title">Wie möchtest du bestellen?</h2>
+      <div class="dining-options">
+        <button class="dining-option" data-option="vor_ort">🍽️<br>Im Lokal essen</button>
+        <button class="dining-option" data-option="mitnehmen">🥡<br>Zum Mitnehmen</button>
+      </div>
+
+      <h2 class="sheet-title" style="margin-top:22px;">Zahlungsmethode wählen</h2>
+
       <div class="pay-options">
         <button class="pay-option" data-method="kassa">
           <span class="pay-icon">💶</span>
           <span class="pay-label">
-            <strong>An der Kassa zahlen</strong>
-            <small>Bar oder Karte bei Abholung</small>
-          </span>
+      <strong>An der Kassa zahlen</strong>
+      <small>Bar oder Karte bei Abholung</small>
+    </span>
         </button>
         <button class="pay-option" data-method="apple_pay">
           <span class="pay-icon"></span>
           <span class="pay-label">
-            <strong>Apple Pay</strong>
-            <small>Schnell &amp; kontaktlos</small>
-          </span>
+      <strong>Apple Pay</strong>
+      <small>Schnell &amp; kontaktlos</small>
+    </span>
         </button>
         <button class="pay-option" data-method="google_pay">
           <span class="pay-icon">G</span>
           <span class="pay-label">
-            <strong>Google Pay</strong>
-            <small>Schnell &amp; kontaktlos</small>
-          </span>
+      <strong>Google Pay</strong>
+      <small>Schnell &amp; kontaktlos</small>
+    </span>
         </button>
       </div>
 

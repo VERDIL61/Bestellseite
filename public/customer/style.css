@@ -447,3 +447,25 @@ html, body {
   body { background: var(--bg-dark-alt); }
   .app { box-shadow: 0 0 60px rgba(0,0,0,0.5); }
 }
+
+/* Formatierung für da essen oder mitnehmen */
+.dining-options { display: flex; gap: 10px; margin-bottom: 10px; }
+
+.dining-option {
+  flex: 1;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-light);
+  border-radius: 12px;
+  padding: 16px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  cursor: pointer;
+  text-align: center;
+}
+.dining-option.selected {
+  background: var(--herb);
+  border-color: var(--herb);
+  color: white;
+}

@@ -1,5 +1,6 @@
 let orders = []; // alle heutigen Bestellungen
 let currentView = 'neu'; // "neu" | "in_zubereitung" | "fertig" | "alle"
+let selectedPaymentMethod = null;
 
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' });
@@ -166,6 +167,7 @@ function orderCardHtml(o) {
     actionsHtml += `<button class="btn-done" data-done="${o._id}">Abgeholt</button>`;
   }
 
+    const diningLabel = o.diningOption === 'vor_ort' ? '🍽️ Im Lokal' : '🥡 Zum Mitnehmen';
   return `
     <article class="order-card status-${o.status}">
       <div class="order-card-header">

@@ -6,11 +6,11 @@ const OrderItemSchema = new mongoose.Schema(
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
     name: { type: String, required: true },
     quantity: { type: Number, required: true, default: 1 },
-    unitPrice: { type: Number, required: true }, // Grundpreis + gewaehlte Aufpreise
+    unitPrice: { type: Number, required: true }, // Grundpreis + gewählte Aufpreise
     selectedOptions: [
       {
         groupName: String, // z.B. "Fleisch"
-        labels: [String] // z.B. ["Kalb"] oder ["Schafkaese", "Extra Fleisch"]
+        labels: [String] // z.B. ["Kalb"] oder ["Schafkäse", "Extra Fleisch"]
       }
     ]
   },
@@ -20,9 +20,14 @@ const OrderItemSchema = new mongoose.Schema(
 const OrderSchema = new mongoose.Schema(
   {
     orderNumber: { type: Number, required: true },
-    dateKey: { type: String, required: true }, // "2026-07-12" - fuer taegliche Nummerierung ab #1
+    dateKey: { type: String, required: true }, // "2026-07-12" - für tägliche Nummerierung ab #1
     items: { type: [OrderItemSchema], required: true },
     subtotal: { type: Number, required: true },
+      diningOption: {
+        type: String,
+          enum: ['vor_ort', 'mitnehmen'],
+        required: true
+      },
     paymentMethod: {
       type: String,
       enum: ['kassa', 'apple_pay', 'google_pay'],
