@@ -73,6 +73,7 @@ router.patch('/:id/status', requireAuth, async (req, res) => {
     const io = req.app.get('io');
     io.to('dashboard').emit('order-updated', order);
     io.to('tv').emit('order-updated', order);
+    io.to('order-' + order._id).emit('order-status-changed', order); // Sendet Kunden Bestellung daten
 
     res.json(order);
   } catch (err) {

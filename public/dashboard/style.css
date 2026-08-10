@@ -388,3 +388,16 @@ html, body { margin: 0; padding: 0; font-family: var(--font-body); background: v
   cursor: pointer;
   width: 100%;
 }
+
+.product-row.sold-out { opacity: 0.55; }
+.sold-out-tag {
+  background: var(--paprika);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 100px;
+  margin-left: 6px;
+  text-transform: uppercase;
+}
+.btn-availability { background: var(--amber-light); color: var(--text-dark); }

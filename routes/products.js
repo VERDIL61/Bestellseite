@@ -6,7 +6,7 @@ const requireAuth = require('../middleware/requireAuth');
 // GET /api/products - alle aktiven Produkte, gruppiert nach Kategorie
 router.get('/', async (req, res) => {
   try {
-    const products = await Product.find({ active: true }).sort({ category: 1, sortOrder: 1 });
+    const products = await Product.find().sort({ category: 1, sortOrder: 1 });   // ← GEÄNDERT: { active: true } entfernt
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: 'Produkte konnten nicht geladen werden.' });
@@ -56,6 +56,22 @@ router.delete('/:id', requireAuth, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Produkt konnte nicht gelöscht werden.' });
+  }
+});
+
+// PATCH /api/products/:id/acailability - ausverkauft/verfügbar umschalten
+router.patch('/:id/availability', requireAuth, async (req, res) => {
+  try {
+    const { active } = req.body;
+    const product = await Product.findByIdAndUpdate(
+        req.params.id,
+        { active },
+        { new: true }
+    );
+    if (!product) return res.status(404).json({ error: 'Produkt nicht gefunden.' });
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ error: 'Verfügbarkeit konnte nicht geändert werden.' });
   }
 });
 

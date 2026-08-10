@@ -40,7 +40,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
 
-// Sockets: Clients treten "Raeumen" bei, je nachdem ob sie Dashboard oder TV-Screen sind
+// Sockets: Clients treten "Räumen" bei, je nachdem ob sie Dashboard oder TV-Screen sind
 io.on('connection', (socket) => {
   socket.on('join', (room) => {
     // erlaubte Raeume: "dashboard", "tv"
@@ -48,6 +48,13 @@ io.on('connection', (socket) => {
       socket.join(room);
     }
   });
+
+  // Kunde tritt dem Raum seiner Bestellung bei
+  socket.on('join-order', (orderId) => {
+    if (typeof orderId === 'string' && orderId.length > 0) {
+      socket.join('order-' + orderId);
+    }
+  })
 });
 
 const PORT = process.env.PORT || 3000;

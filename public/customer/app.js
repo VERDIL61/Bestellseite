@@ -11,6 +11,8 @@ let currentQty = 1;
 let selectedPaymentMethod = null;
 let selectedDiningOption = null;
 
+let socket = null;  // Socket Verbindung für Live-Status
+
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 
 // ---------- INIT ----------
@@ -56,19 +58,23 @@ function renderMenu() {
   }
 
   el.innerHTML = items
-    .map(
-      (p) => `
-      <article class="product-card" data-id="${p._id}">
-        ${p.popular ? '<span class="popular-badge">Beliebt</span>' : ''}
+      .map(
+          (p) => `
+      <article class="product-card ${!p.active ? 'sold-out' : ''}" data-id="${p._id}">
+        ${p.popular && p.active ? '<span class="popular-badge">Beliebt</span>' : ''}
+        ${!p.active ? '<span class="sold-out-badge">Ausverkauft</span>' : ''}
         <span class="emoji">${p.emoji}</span>
         <span class="name">${p.name}</span>
         <span class="price">ab ${fmt(p.basePrice)}</span>
       </article>`
-    )
-    .join('');
+      )
+      .join('');
 
   el.querySelectorAll('.product-card').forEach((card) => {
-    card.addEventListener('click', () => openProduct(card.dataset.id));
+    const product = products.find((p) => p._id === card.dataset.id);
+    if (product && product.active) {                                    // ← nur aktive Produkte klickbar
+      card.addEventListener('click', () => openProduct(card.dataset.id));
+    }
   });
 }
 
@@ -386,13 +392,54 @@ function showConfirmation(order) {
   document.getElementById('confirmNumber').textContent = '#' + order.orderNumber;
   const waitMin = 10 + order.items.reduce((s, i) => s + i.quantity, 0) * 2;
   document.getElementById('confirmWait').textContent = `${waitMin}–${waitMin + 3} Min.`;
+
+  // Status-Anzeige zurücksetzen
+  updateLiveStatus(order.status);
+
+  // Mit dem Server verbinden und dem Raum DIESER Bestellung beitreten
+  connectOrderSocket(order._id);
+
   document.getElementById('confirmOverlay').classList.remove('hidden');
+}
+
+// Live-Verbindung für den Bestellstatus aufbauen
+function connectOrderSocket(orderId) {
+  if (!socket) socket = io();
+  socket.emit('join-order', orderId);
+
+  socket.on('order-status-changed', (order) => {
+    updateLiveStatus(order.status);
+  });
+}
+
+// Statusanzeige aktualisieren
+function updateLiveStatus(status) {
+  const box = document.getElementById('orderStatusLive');
+  const text = document.getElementById('statusText');
+  box.classList.remove('ready');
+
+  if (status === 'neu') {
+    text.textContent = 'Bestellung eingegangen';
+  } else if (status === 'in_zubereitung') {
+    text.textContent = 'Wird zubereitet …';
+  } else if (status === 'fertig') {
+    text.textContent = '😋 Abholbereit! Bitte zur Theke kommen.';
+    box.classList.add('ready');
+  } else if (status === 'abgeholt') {
+    text.textContent = 'Abgeholt – guten Appetit!';
+  }
 }
 
 function resetForNewOrder() {
   cart = [];
   renderCartBar();
   document.getElementById('confirmOverlay').classList.add('hidden');
+
+  // Alte Socket Verbindung trennen, damit keine alten Status-Updates mehr reinkommen
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
 }
 
 init();

@@ -175,7 +175,7 @@ function orderCardHtml(o) {
         <span class="order-time">${fmtTime(o.createdAt)}</span>
       </div>
       <div class="order-items">${itemsHtml}</div>
-      <div class="order-payment">${paymentLabel(o.paymentMethod)}</div>
+      <div class="order-payment">${diningLabel} · ${paymentLabel(o.paymentMethod)}</div>
       <div class="order-total"><span>Summe</span><span>${fmt(o.subtotal)}</span></div>
       <div class="order-actions">${actionsHtml}</div>
     </article>
@@ -247,15 +247,16 @@ function renderProducts() {
     return;
   }
 
-  el.innerHTML = products.map(p => `
-  <div class="product-row">
+    el.innerHTML = products.map(p => `
+  <div class="product-row ${!p.active ? 'sold-out' : ''}">
        <span class="emoji">${p.emoji}</span>
        <div class="product-row-info">
-       <div class="name">${p.name}</div>
+       <div class="name">${p.name} ${!p.active ? '<span class="sold-out-tag">Ausverkauft</span>' : ''}</div>
        <div class="meta">${p.category}</div>
 </div>
 <span class="product-row-price">${fmt(p.basePrice)}</span>
 <div class="product-row-actions">
+                <button class="btn-availability" data-availability="${p._id}">${p.active ? 'Als ausverkauft markieren' : 'Wieder verfügbar'}</button>
                 <button class="btn-edit" data-edit="${p._id}">Bearbeiten</button>
                 <button class="btn-delete" data-delete="${p._id}">Löschen</button>
 </div>
@@ -270,6 +271,11 @@ function renderProducts() {
           const product = products.find(p => p._id === btn.dataset.edit);
           openProductForm(product);
         });
+
+    el.querySelectorAll('[data-availability]').forEach(btn => {
+        btn.addEventListener('click', () => toggleAvailability(btn.dataset.availability));
+    });
+
     });
 }
 
@@ -288,6 +294,25 @@ async function deleteProduct(id) {
         loadProducts(); // Liste danach neu laden
     } catch (err) {
         alert('Produkt konnte nicht gelöscht werden.');
+    }
+}
+
+async function toggleAvailability(id) {
+    const product = products.find(p => p._id === id);
+
+    try {
+        const res = await fetch(`/api/products/${id}/availability`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ active: !product.active })   // umdrehen: verfügbar <-> ausverkauft
+        });
+        if (!res.ok) {
+            alert('Verfügbarkeit konnte nicht geändert werden (nicht angemeldet?).');
+            return;
+        }
+        loadProducts();   // Liste neu laden, Button-Text und Markierung aktualisieren sich
+    } catch (err) {
+        alert('Verfügbarkeit konnte nicht geändert werden.');
     }
 }
 

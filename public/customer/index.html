@@ -140,6 +140,12 @@
       <h2>Danke für deine Bestellung!</h2>
       <p class="confirm-sub">Deine Bestellnummer</p>
       <div class="order-stamp"><span id="confirmNumber">#0</span></div>
+
+      <div class="order-status-live" id="orderStatusLive">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Bestellung eingegangen</span>
+      </div>
+
       <p class="confirm-wait">Geschätzte Wartezeit: <strong id="confirmWait">12–15 Min.</strong></p>
       <button class="btn-primary" id="newOrderBtn">Neue Bestellung</button>
     </section>
@@ -147,6 +153,7 @@
 
 </div>
 
+<script src="/socket.io/socket.io.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
