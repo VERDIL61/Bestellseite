@@ -18,6 +18,8 @@ const authRoutes = require('./routes/auth');
 const Admin = require('./models/Admin');
 const bcrypt =require('bcryptjs');
 
+const statsRoutes = require('./routes/stats');
+
 app.set('io', io); // damit routes/orders.js Events senden kann
 
 app.use(cors());
@@ -39,6 +41,7 @@ app.use('/tv', express.static('public/tv'));
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/stats', statsRoutes);
 
 // Sockets: Clients treten "Räumen" bei, je nachdem ob sie Dashboard oder TV-Screen sind
 io.on('connection', (socket) => {

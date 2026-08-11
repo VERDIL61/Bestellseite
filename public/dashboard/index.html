@@ -54,6 +54,9 @@
       <button class="nav-item" data-view="produkte">
         <span>🛒 Produkte</span>
       </button>
+      <button class="nav-item" data-view="statistik">
+        <span>📊 Statistik</span>
+      </button>
     </nav>
 
     <div class="sidebar-footer">
@@ -85,6 +88,36 @@
     <div class="products-view hidden" id="productsView">
       <div class="products-list" id="productsList"></div>
     </div>
+
+    <div class="stats-view hidden" id="statsView">
+      <div class="stats-range">
+        <button class="range-btn active" data-range="heute">Heute</button>
+        <button class="range-btn" data-range="woche">Woche</button>
+        <button class="range-btn" data-range="monat">Monat</button>
+      </div>
+
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-label">Umsatz</div>
+          <div class="stat-value" id="statRevenue">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Bestellungen</div>
+          <div class="stat-value" id="statOrders">-</div>
+        </div>
+      </div>
+
+      <div class="stats-chart-box">
+        <h3>Umsatz pro Tag</h3>
+        <canvas id="revenueChart"></canvas>
+      </div>
+
+      <div class="stats-top-box">
+        <h3>Meistverkaufte Produkte</h3>
+        <div id="topProductsList"
+      </div>
+    </div>
+
     </main>
 </div>
 <!-- Druckvorlage (nur beim Drucken sichtbar) -->
@@ -177,7 +210,7 @@
       </form>
     </section>
   </div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="app.js"></script>
 </body>

@@ -23,7 +23,7 @@ const OptionGroupSchema = new mongoose.Schema(
 const ProductSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    category: { type: String, required: true }, // z.B. "Kebap & Duerum"
+    category: { type: String, required: true }, // z.B. "Kebap & Dürum"
     description: { type: String, default: '' },
     basePrice: { type: Number, required: true },
     emoji: { type: String, default: '🍽️' }, // Platzhalter-Icon statt Foto

@@ -5,7 +5,7 @@ let selectedPaymentMethod = null;
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' });
 
-const statusLabels = { neu: 'Neue Bestellungen', in_zubereitung: 'In Zubereitung', fertig: 'Fertig', alle: 'Alle Bestellungen', produkte: 'Produkte verwalten' };
+const statusLabels = { neu: 'Neue Bestellungen', in_zubereitung: 'In Zubereitung', fertig: 'Fertig', alle: 'Alle Bestellungen', produkte: 'Produkte verwalten', statistik: 'Statistik' };
 
 // ---------- INIT ----------
 async function init() {
@@ -96,15 +96,21 @@ function switchView(view) {
   document.getElementById('viewTitle').textContent = statusLabels[view];
   document.getElementById('addProductIconBtn').classList.toggle('hidden', view !== 'produkte');
 
-  if (view === 'produkte') {
+  // Alle drei Hauptbereiche erst verstecken
     document.getElementById('ordersGrid').classList.add('hidden');
-    document.getElementById('productsView').classList.remove('hidden');
-    loadProducts();
-  } else {
     document.getElementById('productsView').classList.add('hidden');
-    document.getElementById('ordersGrid').classList.remove('hidden');
-    renderOrders();
-  }
+    document.getElementById('statsView').classList.add('hidden');
+
+    if (view === 'produkte') {
+        document.getElementById('productsView').classList.remove('hidden');
+        loadProducts();
+    } else if (view === 'statistik') {
+        document.getElementById('statsView').classList.remove('hidden');
+        loadStats('heute');
+    } else {
+        document.getElementById('ordersGrid').classList.remove('hidden');
+        renderOrders();
+    }
 }
 
 // ---------- RENDER ----------
@@ -271,11 +277,10 @@ function renderProducts() {
           const product = products.find(p => p._id === btn.dataset.edit);
           openProductForm(product);
         });
+    });
 
     el.querySelectorAll('[data-availability]').forEach(btn => {
         btn.addEventListener('click', () => toggleAvailability(btn.dataset.availability));
-    });
-
     });
 }
 
@@ -570,6 +575,75 @@ document.getElementById('passwordForm').addEventListener('submit', async (e) => 
         errorEl.textContent = 'Verbindung zum Server fehlgeschlagen.';
     }
 });
+
+// --- Statistik ---
+let revenueChart = null; // merkt sich das Chart-Objekt, um es beim Neuladen zu zerstören
+
+async function loadStats(range) {
+    // aktiven Zeitraum Button markieren
+    document.querySelectorAll('.range-btn').forEach((b) => b.classList.toggle('active', b.dataset.range === range));
+
+    try {
+        const res = await fetch(`/api/stats?range=${range}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        renderStats(data);
+    } catch (err) {
+        console.error('Statistik konnte nicht geladen werden', err);
+    }
+}
+
+function renderStats(data) {
+        document.getElementById('statRevenue').textContent = fmt(data.revenue);
+        document.getElementById('statOrders').textContent = data.orderCount;
+
+        // Top-Produkte
+    const topEl = document.getElementById('topProductsList');
+    if (data.topProducts.length === 0) {
+        topEl.innerHTML = '<p class="empty">Noch keine Verkäufe in diesem Zeitraum.</p>';
+    } else {
+        topEl.innerHTML = data.topProducts.map((p, i) => `
+            <div class="top-product-row">
+                <span class="top-product-rank">${i + 1}</span>
+                <span class="top-product-name">${p.name}</span>
+                <span class="top-product-count">${p.count}x</span>
+            </div>
+        `).join('');
+    }
+
+    // Balkendiagramm
+    renderChart(data.chartData);
+}
+
+function renderChart(chartData) {
+        const ctx = document.getElementById('revenueChart');
+
+        // altes Chart zerstören, sonst überlagern sie sich beim Umschalten
+    if (revenueChart) revenueChart.destroy();
+
+    revenueChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartData.map((d) => d.day),
+            datasets: [{
+                label: 'Umsatz (€)',
+                data: chartData.map((d) => d.total),
+                backgroundColor: '#d1471f',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+
+// Zeitraum Buttons
+    document.querySelectorAll('.range-btn').forEach((btn) => {
+        btn.addEventListener('click', () => loadStats(btn.dataset.range));
+    });
 
 // beim Laden prüfen ob die Session noch gültig ist
 checkAuth().then((isAdmin) => {
