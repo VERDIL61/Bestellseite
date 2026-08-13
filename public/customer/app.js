@@ -63,7 +63,7 @@ function renderMenu() {
       <article class="product-card ${!p.active ? 'sold-out' : ''}" data-id="${p._id}">
         ${p.popular && p.active ? '<span class="popular-badge">Beliebt</span>' : ''}
         ${!p.active ? '<span class="sold-out-badge">Ausverkauft</span>' : ''}
-        <span class="emoji">${p.emoji}</span>
+        ${p.imageData ? `<img class="product-img" src="${p.imageData}" alt="" />` : `<span class="emoji">${p.emoji}</span>`}
         <span class="name">${p.name}</span>
         <span class="price">ab ${fmt(p.basePrice)}</span>
       </article>`
@@ -124,7 +124,7 @@ function renderProductSheet() {
 
   body.innerHTML = `
     <div class="product-hero">
-      <span class="emoji">${p.emoji}</span>
+      ${p.imageData ? `<img class="product-hero-img" src="${p.imageData}" alt="" />` : `<span class="emoji">${p.emoji}</span>`}
       <div>
         <h2>${p.name}</h2>
         <span class="base-price">${fmt(p.basePrice)}</span>
@@ -226,6 +226,7 @@ function addToCart() {
     productId: currentProduct._id,
     name: currentProduct.name,
     emoji: currentProduct.emoji,
+    imageData: currentProduct.imageData,
     unitPrice,
     quantity: currentQty,
     selectedOptions
@@ -268,7 +269,7 @@ function renderCartItems() {
         const optsText = item.selectedOptions.map((o) => `${o.groupName}: ${o.labels.join(', ')}`).join(' · ');
         return `
         <div class="cart-item">
-          <span class="emoji">${item.emoji}</span>
+          ${item.imageData ? `<img class="cart-item-img" src="${item.imageData}" alt="" />` : `<span class="emoji">${item.emoji}</span>`}
           <div class="cart-item-info">
             <div class="name">${item.name}</div>
             ${optsText ? `<div class="opts">${optsText}</div>` : ''}

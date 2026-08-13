@@ -205,6 +205,11 @@ async function setStatus(orderId, status) {
   }
 }
 
+// Klick Button für Produkt einfügen/Bearbeiten
+document.getElementById('fileUploadBtn').addEventListener('click', () => {
+    document.getElementById('pfImageFile').click();
+});
+
 function printOrder(orderId) {
   const o = orders.find((x) => x._id === orderId);
   if (!o) return;
@@ -235,6 +240,41 @@ document.getElementById('testSoundBtn').addEventListener('click', playNotificati
 // Produktverwaltung
 let products = [];
 
+// Liest eine Bilddatei ein, verkleinert sie auf max. 400px und gibt Base64 zurück
+function readAndResizeImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const maxSize = 400;
+                let {width, height} = img;
+
+                // Seitenverhältnis beibehalten, größere Seite auf maxSize begrenzen
+                if (width > height && width > maxSize) {
+                    height = height * (maxSize / width);
+                    width = maxSize;
+                } else if (height > maxSize) {
+                    width = width * (maxSize / height);
+                    height = maxSize;
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+                // als JPEG mit 80% Qualität > kleiner als PNG
+                resolve(canvas.toDataURL('image/jpeg', 0.8));
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
 async function loadProducts() {
   try {
     const res = await fetch('/api/products');
@@ -255,7 +295,7 @@ function renderProducts() {
 
     el.innerHTML = products.map(p => `
   <div class="product-row ${!p.active ? 'sold-out' : ''}">
-       <span class="emoji">${p.emoji}</span>
+       ${p.imageData ? `<img class="product-img" src="${p.imageData}" alt="" />` : `<span class="emoji">${p.emoji}</span>`}
        <div class="product-row-info">
        <div class="name">${p.name} ${!p.active ? '<span class="sold-out-tag">Ausverkauft</span>' : ''}</div>
        <div class="meta">${p.category}</div>
@@ -322,7 +362,7 @@ async function toggleAvailability(id) {
 }
 
 let editingProductId = null; // null = neues Produkt, sonst die ID des bearbeiteten Produkts
-
+let currentImageData = ''; // Base64-Bild von gerade bearbeiteten Produkts
 let currentOptionGroups = []; // die Options-Gruppen des gerade geöffneten Formulars
 
 function renderOptionGroupsEditor() {
@@ -410,6 +450,18 @@ document.getElementById('addGroupBtn').addEventListener('click', () => {
     renderOptionGroupsEditor();
 });
 
+// Datei Auswahl-Handler
+document.getElementById('pfImageFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+        currentImageData = await readAndResizeImage(file);
+        document.getElementById('imagePreview').innerHTML = `<img src="${currentImageData}" alt="Vorschau" />`;
+    } catch (err) {
+        alert('Bild konnte nicht verarbeitet werden.');
+    }
+});
 
 function updateCategoryDatalist() {
   const categories = [...new Set(products.map(p => p.category))];
@@ -426,6 +478,13 @@ function openProductForm(product) {
   document.getElementById('pfBasePrice').value = product ? product.basePrice : '';
   document.getElementById('pfEmoji').value = product ? product.emoji : '';
   document.getElementById('pfPopular').checked = product ? product.popular : false;
+
+  // Bild laden oder bei neuem Produkt leer
+    currentImageData = product ? (product.imageData || ''): '';
+    document.getElementById('pfImageFile').value = ''; // Datei Auswahl zurücksetzen
+    document.getElementById('imagePreview').innerHTML = currentImageData
+        ? `<img src="${currentImageData}" alt="Vorschau" />`
+        : '';
 
   // Änderungen im Formular dürfen nicht sofort das Original in "products" verändern,
   // bevor "Speichern" geklickt wurde
@@ -454,6 +513,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     basePrice: Number(document.getElementById('pfBasePrice').value),
     emoji: document.getElementById('pfEmoji').value || '🍽️',
     popular: document.getElementById('pfPopular').checked,
+    imageData: currentImageData,
     optionGroups: currentOptionGroups
   };
 

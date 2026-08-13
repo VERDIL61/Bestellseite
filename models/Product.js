@@ -27,6 +27,7 @@ const ProductSchema = new mongoose.Schema(
     description: { type: String, default: '' },
     basePrice: { type: Number, required: true },
     emoji: { type: String, default: '🍽️' }, // Platzhalter-Icon statt Foto
+    imageData: { type: String, default: '' },   // leer = kein Bild
     popular: { type: Boolean, default: false },
     active: { type: Boolean, default: true },
     optionGroups: { type: [OptionGroupSchema], default: [] },

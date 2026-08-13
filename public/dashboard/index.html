@@ -156,7 +156,16 @@
           Emoji
           <input type="text" id="pfEmoji" maxlength="4" placeholder="🍽️" />
         </label>
+
       </div>
+
+      <!--Produkt Foto einfügen -->
+      <label class="file-upload-label">
+        Produktbild (optional)
+        <input type="file" id="pfImageFile" accept="image/*" class="file-input-hidden" />
+        <span class="file-upload-btn" id="fileUploadBtn">📷 Bild auswählen</span>
+      </label>
+      <div class="image-preview" id="imagePreview"></div>
 
       <label class="checkbox-label">
         <input type="checkbox" id="pfPopular" />

@@ -133,16 +133,15 @@
 - type: 'multi' → Checkbox, beliebig viele (z.B. Extras mit Aufpreis)  
    
    
-**GitHub hochladen**  
+## GitHub hochladen
 1. Änderungen hinzufügen (Staging)  
-   
- “ git add . “  
+“ git add . “  
+--
 2. Änderungen lokal speichern (Commit)  
-   
- “ git commit -m "Hier deine Beschreibung eintragen, z.B. Bugfix oder neues Feature" “  
+“ git commit -m "Hier deine Beschreibung eintragen, z.B. Bugfix oder neues Feature" “  
+--
 3. Auf GitHub hochladen (Push)  
-   
- “ git push “  
+“ git push “  
 
 ## Lizenz
 
