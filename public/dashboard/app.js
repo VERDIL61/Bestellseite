@@ -442,7 +442,7 @@ function renderOptionGroupsEditor() {
         });
     });
 
-    // Strukturelle Aenderungen (Gruppe/Auswahl hinzufuegen oder entfernen): HIER wird neu gerendert
+    // Strukturelle Änderungen (Gruppe/Auswahl hinzufügen oder entfernen): HIER wird neu gerendert
     el.querySelectorAll('[data-remove-group]').forEach(btn => {
         btn.addEventListener('click', () => {
             currentOptionGroups.splice(btn.dataset.removeGroup, 1);
@@ -525,9 +525,12 @@ document.getElementById('productFormCancel').addEventListener('click', closeProd
 document.getElementById('productForm').addEventListener('submit', async (e) => {
   e.preventDefault(); // verhindert, dass der Browser die Seite neu lädt (Standard-Verhalten von <form>)
 
+    const rawCategory = document.getElementById('pfCategory').value.trim();
+    const category = rawCategory.charAt(0).toUpperCase() + rawCategory.slice(1);
+
   const payload = {
     name: document.getElementById('pfName').value,
-    category: document.getElementById('pfCategory').value,
+    category: category,
     description: document.getElementById('pfDescription').value,
     basePrice: Number(document.getElementById('pfBasePrice').value),
     emoji: document.getElementById('pfEmoji').value || '🍽️',
