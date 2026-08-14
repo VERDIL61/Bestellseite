@@ -286,39 +286,58 @@ async function loadProducts() {
 }
 
 function renderProducts() {
-  const el = document.getElementById('productsList');
+    const el = document.getElementById('productsList');
 
-  if (products.length === 0) {
-    el.innerHTML = '<p class="empty">Noch keine Produkte angelegt.</p>';
-    return;
-  }
+    if (products.length === 0) {
+        el.innerHTML = '<p class="empty">Noch keine Produkte angelegt.</p>';
+        return;
+    }
 
-    el.innerHTML = products.map(p => `
-  <div class="product-row ${!p.active ? 'sold-out' : ''}">
-       ${p.imageData ? `<img class="product-img" src="${p.imageData}" alt="" />` : `<span class="emoji">${p.emoji}</span>`}
-       <div class="product-row-info">
-       <div class="name">${p.name} ${!p.active ? '<span class="sold-out-tag">Ausverkauft</span>' : ''}</div>
-       <div class="meta">${p.category}</div>
-</div>
-<span class="product-row-price">${fmt(p.basePrice)}</span>
-<div class="product-row-actions">
-                <button class="btn-availability" data-availability="${p._id}">${p.active ? 'Als ausverkauft markieren' : 'Wieder verfügbar'}</button>
-                <button class="btn-edit" data-edit="${p._id}">Bearbeiten</button>
-                <button class="btn-delete" data-delete="${p._id}">Löschen</button>
-</div>
-  </div>
-    `).join('');
-    
-        el.querySelectorAll('[data-delete]').forEach(btn => {
+    // Produkte nach Kategorie gruppieren: { "Getränke": [...], "Burger": [...] }
+    const grouped = {};
+    products.forEach((p) => {
+        if (!grouped[p.category]) grouped[p.category] = [];
+        grouped[p.category].push(p);
+    });
+
+    // Kategorien alphabetisch sortiert durchgehen und je eine Gruppe rendern
+    const categoriesSorted = Object.keys(grouped).sort();
+
+    el.innerHTML = categoriesSorted.map((category) => {
+        const rowsHtml = grouped[category].map((p) => `
+            <div class="product-row ${!p.active ? 'sold-out' : ''}">
+                ${p.imageData ? `<img class="product-img" src="${p.imageData}" alt="" />` : `<span class="emoji">${p.emoji}</span>`}
+                <div class="product-row-info">
+                    <div class="name">${p.name} ${!p.active ? '<span class="sold-out-tag">Ausverkauft</span>' : ''}</div>
+                    <div class="meta">${p.category}</div>
+                </div>
+                <span class="product-row-price">${fmt(p.basePrice)}</span>
+                <div class="product-row-actions">
+                    <button class="btn-availability" data-availability="${p._id}">${p.active ? 'Als ausverkauft markieren' : 'Wieder verfügbar'}</button>
+                    <button class="btn-edit" data-edit="${p._id}">Bearbeiten</button>
+                    <button class="btn-delete" data-delete="${p._id}">Löschen</button>
+                </div>
+            </div>
+        `).join('');
+
+        return `
+            <div class="category-group">
+                <h3 class="category-heading">${category} <span class="category-count">${grouped[category].length}</span></h3>
+                ${rowsHtml}
+            </div>
+        `;
+    }).join('');
+
+    // Event-Listener (wie gehabt)
+    el.querySelectorAll('[data-delete]').forEach(btn => {
         btn.addEventListener('click', () => deleteProduct(btn.dataset.delete));
     });
     el.querySelectorAll('[data-edit]').forEach(btn => {
         btn.addEventListener('click', () => {
-          const product = products.find(p => p._id === btn.dataset.edit);
-          openProductForm(product);
+            const product = products.find(p => p._id === btn.dataset.edit);
+            openProductForm(product);
         });
     });
-
     el.querySelectorAll('[data-availability]').forEach(btn => {
         btn.addEventListener('click', () => toggleAvailability(btn.dataset.availability));
     });
