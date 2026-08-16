@@ -75,6 +75,7 @@ connectDB().then(async () => {
     console.log(`   Server läuft auf http://localhost:${PORT}`);
     console.log(`   Kunden-Bestellseite: http://localhost:${PORT}`);
     console.log(`   Mitarbeiter-Dashboard: http://localhost:${PORT}/dashboard`);
+    console.log(`   TV-Abholbildschirm: http://localhost:${PORT}/tv`);
   })
 })
 
