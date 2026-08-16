@@ -373,12 +373,26 @@ html, body {
 
 /* ---------- ZAHLUNG ---------- */
 .pay-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+
+/* Formatierung für Zahlungs Option */
 .pay-option {
-  display: flex; align-items: center; gap: 14px;
-  background: var(--bg-card); border: 1px solid var(--border-subtle);
-  border-radius: 12px; padding: 14px; cursor: pointer; text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-light);
 }
-.pay-option.selected { border-color: var(--herb); background: rgba(76,122,59,0.18); }
+
+.pay-option.selected {
+  border-color: var(--herb);
+  background: rgba(76,122,59,0.18);
+}
+
 .pay-icon {
   font-size: 20px; width: 38px; height: 38px; border-radius: 100px;
   background: var(--bg-dark); display: flex; align-items: center; justify-content: center;
